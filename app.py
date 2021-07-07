@@ -13,6 +13,7 @@ def main(classificador):
     )
 
     print(process_file)
+    print(os.environ.get('TOKEN'))
     if process_file != None:
         if process_file.name.endswith('.csv'):
             df = pd.read_csv(
@@ -22,7 +23,10 @@ def main(classificador):
             df = pd.read_excel(
                 process_file, engine="openpyxl")
 
+        st.info('Fazendo as predições ...')
         df['Labels'] = classificador.predict(df["Descrição"].astype("unicode"))
+
+        st.success('Predições feitas com sucesso.')
 
         st.dataframe(df.head(20))
 
