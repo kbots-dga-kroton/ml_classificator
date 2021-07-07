@@ -17,9 +17,8 @@ def to_excel(df):
 
 def get_table_download_link(df):
     val = to_excel(df)
-    b64 = base64.b64encode(val).decode()
-    href = f'<a href="data:file/csv;base64,{b64}">Download csv file</a>'
-    return href
+    b64 = base64.b64encode(val)
+    return f'<a href="data:application/octet-stream;base64,{b64.decode()}" download="extract.xlsx">Download xlsx file</a>'
 
 
 def main(classificador):
