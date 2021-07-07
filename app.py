@@ -4,12 +4,13 @@ import pickle
 import os
 import base64
 from io import BytesIO
+from datetime import datetime
 
 
 def to_excel(df):
     output = BytesIO()
     writer = pd.ExcelWriter(output, engine='xlsxwriter')
-    df.to_excel(writer, sheet_name='Sheet1')
+    df.to_excel(writer, index=False, sheet_name='Sheet1')
     writer.save()
     processed_data = output.getvalue()
     return processed_data
@@ -17,9 +18,11 @@ def to_excel(df):
 
 def get_table_download_link(df):
     val = to_excel(df)
-    b64 = base64.b64encode(val).decode()
-    href = f'<a href="data:file/csv;base64,{b64}">Download csv file</a>'
-    return href
+    b64 = base64.b64encode(val)
+    date_now = datetime.utcnow()
+    file_name = f'data_resultado-{date_now.strftime("%Y%m%d%H%M%S")}.xlsx'
+    link_download = f""" <a href="data:application/octet-stream;base64,{b64.decode()}" download="{file_name}">Download xlsx file</a> """
+    return link_download
 
 
 def main(classificador):
@@ -48,7 +51,9 @@ def main(classificador):
             st.write('Predições feitas com sucesso !!!')
 
         st.dataframe(df.head(20))
+        st.text('Gerando link para download ...')
         st.markdown(get_table_download_link(df), unsafe_allow_html=True)
+        st.success('Link gerado com sucesso.')
 
 
 if __name__ == '__main__':
