@@ -1,4 +1,5 @@
 import streamlit as st
+import plotly.express as px
 import pandas as pd
 import pickle
 import os
@@ -25,10 +26,27 @@ def get_table_download_link(df):
     return link_download
 
 
+def plot_graph(df_graph):
+    fig = px.bar(
+        df_graph,
+        x='Labels',
+        y='Descrição',
+        # text='Text test',
+        title='Test',
+        labels={
+              "Labels": "Labels",
+            "Descrição": 'Número de coisas'
+        },
+        # width=1400,
+        height=500
+    )
+    return fig
+
+
 def main(classificador):
-    st.title('Model test')
+    st.title('Model')
     process_file = st.file_uploader(
-        "Faça o upload dos arquivos no campo abaixo.",
+        "Faça o upload do arquivo no campo abaixo.",
         type=["csv", "xlsx"],
         accept_multiple_files=False
     )
@@ -51,6 +69,11 @@ def main(classificador):
             st.write('Predições feitas com sucesso !!!')
 
         st.dataframe(df.head(20))
+
+        df_graph = df.groupby(['Labels'], as_index=False)['Descrição'].count()
+        df_graph.sort_values(by=['Descrição'], inplace=True, ascending=False)
+        print(df_graph)
+        st.plotly_chart(plot_graph(df_graph), use_container_width=True)
         st.text('Gerando link para download ...')
         st.markdown(get_table_download_link(df), unsafe_allow_html=True)
         st.success('Link gerado com sucesso.')
